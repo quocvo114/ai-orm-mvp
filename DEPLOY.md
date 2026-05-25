@@ -4,10 +4,8 @@ Deployment checklist for AI-Powered ORM (MVP)
 - NEXT_PUBLIC_SUPABASE_URL
 - NEXT_PUBLIC_SUPABASE_ANON_KEY
 - SUPABASE_SERVICE_ROLE_KEY (server-only)
-- AI_PROVIDER ("gemini" or "openai")
+- AI_PROVIDER ("gemini")
 - GEMINI_API_KEY (if using Gemini)
-- OPENAI_API_KEY (if using OpenAI)
-- OPENAI_MODEL (optional, default gpt-4o-mini)
 - GOOGLE_PLACES_API_KEY
 
 2) Steps to deploy to Vercel:

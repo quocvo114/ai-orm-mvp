@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ai-orm-mvp
 
-## Getting Started
+Lightweight MVP that automates reply drafts for Google Maps reviews. Designed for quick experiments and demos — not production-ready.
 
-First, run the development server:
+What it does
+- Fetches reviews from Google Places (Place ID).
+- Stores and lists reviews in Supabase.
+- Generates 3 reply suggestions per review using an AI provider (Gemini).
+- Lets an operator review and mark replies as approved.
+
+Tech stack
+- Next.js (app router) + React
+- Tailwind CSS for styling
+- Supabase (client + server client)
+- AI adapter: `lib/ai.ts` (supports Gemini/OpenAI)
+
+Status
+- Core flows implemented: fetch -> generate -> approve
+- Fallback generation available when AI provider is unavailable
+- Requires API keys to test full end-to-end
+
+
+## Quick start
+
+1. Clone
+
+```bash
+git clone <repo-url>
+cd ai-orm-mvp
+```
+
+2. Install
+
+```bash
+npm install
+# if you hit peer-deps errors (common when adding packages):
+npm install --legacy-peer-deps
+```
+
+3. Create `.env.local` (example)
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...   
+AI_PROVIDER=gemini             
+GEMINI_API_KEY=...
+OPENAI_API_KEY=...
+GOOGLE_PLACES_API_KEY=...
+```
+
+4. Run
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Important files
+- `app/page.tsx` — dashboard UI (Place ID input, filters, list, generate/approve actions)
+- `app/api/generate/route.ts` — generate suggestions via `lib/ai.ts`
+- `app/api/fetch-place/route.ts` — fetch reviews from Google Places
+- `app/api/reviews/route.ts` — read reviews (Supabase)
+- `app/api/reviews/[id]/approve/route.ts` — approve endpoint (updates Supabase)
+- `lib/ai.ts` — AI adapter (Gemini/OpenAI + fallback)
+- `lib/supabase.ts` / `lib/supabaseServer.ts` — Supabase clients
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## API endpoints (tóm tắt)
+- POST `/api/fetch-place` — body: `{ placeId }` → trả về `{ reviews: [...] }` (gọi Google Places)
+- POST `/api/generate` — body: `{ review: { text, rating, author }, reviewId? }` → trả về `{ suggestions }` (3 gợi ý theo tone)
+- GET `/api/reviews` — trả về review hiện có (limit 20)
+- POST `/api/reviews/:id/approve` — đánh dấu review `Đã giải quyết` (cập nhật DB nếu có service key)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Development notes & troubleshooting
+- Nếu `npm install` báo lỗi peer-deps (ERESOLVE) khi thêm package mới: dùng `npm install --legacy-peer-deps`.
+- Nếu `npm run dev` bị lỗi và exit code 1:
+	- Kiểm tra `NEXT_PRIVATE`/`SUPABASE_SERVICE_ROLE_KEY` nếu code cố gắng dùng server-only key.
+	- Xem logs trong terminal để biết file/line gây lỗi.
+	- Xóa thư mục `.next` rồi chạy lại nếu cần: `rm -rf .next && npm run dev` (Windows PowerShell: `Remove-Item -Recurse -Force .next`).
+- Khi dùng Gemini: model name và quota có thể gây 404/429 — kiểm tra model hiện có trong console Google Cloud và key hợp lệ.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Testing
+- Có sẵn `scripts/test-gemini.mjs` để thử gọi Gemini (tham khảo trong repo).
+- Bạn có thể mock AI bằng cách không đặt `GEMINI_API_KEY`/`OPENAI_API_KEY` và API sẽ trả fallback suggestions.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Deployment
+- Xem file `DEPLOY.md` trong repo cho checklist triển khai (Azure / Vercel / Netlify tuỳ lựa chọn).
+
+---
+
+

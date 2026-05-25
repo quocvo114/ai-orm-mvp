@@ -240,7 +240,7 @@ export default function Home() {
                 value={placeId}
                 onChange={(e) => setPlaceId(e.target.value)}
                 className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm text-white placeholder:text-white/60 outline-none ring-0 backdrop-blur focus:border-white/40 focus:bg-white/20"
-                placeholder="Nhập Google Place ID (ví dụ: ChIJN1t_tDeuEmsRUsoyG83OBYc)"
+                placeholder="Nhập Google Place ID"
                 type="text"
               />
               <button onClick={handleFetchPlace} className="rounded-2xl w-[250px] bg-white px-6 py-4 text-sm font-bold text-violet-700 transition hover:bg-white/95 active:scale-[0.99]">
