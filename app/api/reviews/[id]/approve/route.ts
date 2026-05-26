@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "../../../../../lib/supabaseServer";
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
-  const id = Number(params.id);
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id: idParam } = await params;
+  const id = Number(idParam);
   if (Number.isNaN(id)) {
     return NextResponse.json({ success: false, error: "Invalid id" }, { status: 400 });
   }
